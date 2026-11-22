@@ -1,0 +1,8 @@
+# dsh bundle layer: mount the thin-ssh tool set.
+#
+# The agent keeps running in this harness process; every registered tool shells
+# out to the local OpenSSH client so that the actual work happens on the remote
+# host. No browser half is declared on purpose.
+- insert:
+    - id: dsh-thin-ssh
+      name: 'dsh-thin-ssh'
