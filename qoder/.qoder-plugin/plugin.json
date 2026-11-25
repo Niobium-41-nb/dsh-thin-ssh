@@ -1,0 +1,15 @@
+{
+  "name": "qoder-thin-ssh",
+  "displayName": "Thin SSH",
+  "version": "0.1.0",
+  "description": "通过本机 OpenSSH 客户端在远程服务器执行命令、读写文件和列举目录。",
+  "author": {
+    "name": "DSH plugin contributors"
+  },
+  "keywords": [
+    "qoder-plugin",
+    "ssh",
+    "remote",
+    "mcp"
+  ]
+}

@@ -9,6 +9,10 @@ tools, starts no daemon, listens on no port, and stores no password or private k
 
 > 🇨🇳 完整文档为中文，见下文。
 
+## Qoder Desktop
+
+本仓库也提供独立的 [Qoder Desktop 适配插件](qoder/README.md)。它通过 Qoder 内置 Node.js 运行 MCP 服务，提供六个 `thin_ssh_*` 工具，无需安装 DeepSeek Harness 或 npm 依赖。插件 ZIP、校验文件和市场提交材料位于 [`qoder/`](qoder/)，发布包见 [GitHub Releases](https://github.com/Niobium-41-nb/dsh-thin-ssh/releases)。
+
 让 DeepSeek Harness 的 Agent **主体留在本地**，而所有对服务器的操作都在远端执行。
 
 插件向模型注册六个 `thin_ssh_*` 工具。Agent 仍然在本地思考、读会话、调度工具；每一次实际命令、文件读写、目录列举都通过本机 OpenSSH 客户端送到服务器。它不启动常驻服务，不监听端口，也不保存任何密码或私钥。
