@@ -1,6 +1,6 @@
 # dsh-thin-ssh
 
-[![check](https://github.com/Niobium-41-nb/dsh-thin-ssh/actions/workflows/check.yml/badge.svg)](https://github.com/Niobium-41-nb/dsh-thin-ssh/actions/workflows/check.yml) [![license](https://img.shields.io/github/license/Niobium-41-nb/dsh-thin-ssh)](https://github.com/Niobium-41-nb/dsh-thin-ssh/blob/master/LICENSE)
+[![check](https://github.com/Niobium-41-nb/dsh-thin-ssh/actions/workflows/check.yml/badge.svg)](https://github.com/Niobium-41-nb/dsh-thin-ssh/actions/workflows/check.yml) [![npm](https://img.shields.io/npm/v/dsh-thin-ssh)](https://www.npmjs.com/package/dsh-thin-ssh) [![license](https://img.shields.io/github/license/Niobium-41-nb/dsh-thin-ssh)](https://github.com/Niobium-41-nb/dsh-thin-ssh/blob/master/LICENSE)
 
 A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin that keeps the agent's
 reasoning loop **local** and moves every server operation to the remote host: commands, file reads and
@@ -33,18 +33,25 @@ tools, starts no daemon, listens on no port, and stores no password or private k
 
 ## 安装
 
+**从 npm 装（推荐）** —— `dsh.bundle.patch` 会自己把这行 `insert` 挂进 `dsh.profile.bundles`，不需要手写 profile 的 patch：
+
+```bash
+DSH="<HARNESS>/resources/runtime/cli/bin/dsh.cmd"
+"$DSH" plugin --profile web add dsh-thin-ssh
+```
+
+**从源码装**（改代码时用）。pnpm 的 `file:` 依赖是按内容快照安装的，所以必须先 `remove` 再 `add`，否则 `add` 会说 "Already up to date" 而不重新拷贝：
+
 ```bash
 # 构建（在插件目录）
 pnpm install --ignore-scripts
 pnpm build
 
-# 装进 profile；注意 pnpm 的 file: 依赖必须先 remove 再 add
-DSH="<HARNESS>/resources/runtime/cli/bin/dsh.cmd"
 "$DSH" plugin --profile web remove dsh-thin-ssh
 "$DSH" plugin --profile web add file:<PLUGINS>/dsh-thin-ssh
 ```
 
-`cordis.patch.yml` 里只有一行 `insert`，无需手工改 profile 的 patch 文件。插件**没有浏览器半边**，因此无需重启宿主去刷新 client boot graph；但新增/删除工具本身属于插件装载，按常规重装流程即可。
+装完重启一次 DSH 生效（新增工具属于插件装载）。插件**没有浏览器半边**，因此不需要为刷新 client boot graph 做额外处理。
 
 ## 快速开始
 

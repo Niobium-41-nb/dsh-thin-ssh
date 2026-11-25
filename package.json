@@ -7,7 +7,9 @@
     "url": "git+https://github.com/Niobium-41-nb/dsh-thin-ssh.git"
   },
   "license": "MIT",
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
@@ -20,6 +22,7 @@
   },
   "files": [
     "lib",
+    "!lib/**/*.tsbuildinfo",
     "cordis.patch.yml",
     "README.md",
     "LICENSE"

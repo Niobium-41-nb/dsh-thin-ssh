@@ -1,0 +1,75 @@
+# Publish dsh-thin-ssh to npm through a trusted publisher (OIDC) — no token stored.
+#
+# Why this file exists: the first publish has to be done by a human in a terminal,
+# because npm cannot configure a trusted publisher for a package that does not
+# exist yet, and a non-TTY shell cannot clear the 2FA challenge. After 0.1.0 is on
+# the registry, the settings page appears and this workflow takes over.
+#
+# Read the workspace checklist before the first run: ../../TRUSTED-PUBLISHING.md.
+# It has the exact npm settings-page values, and the two ways this workflow fails
+# silently (the workflow filename must match byte-for-byte, and the trusted
+# publisher must be allowed to run `npm publish` — configurations created after
+# 2026-09-03 default to `npm stage publish` only).
+name: publish
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write # required: this is what lets npm verify the workflow
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+
+      # Node 24 on purpose: trusted publishing needs the npm CLI at 11.5.1+ and
+      # Node 22 still ships npm 10.x. The package's engines field allows 24.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false # never cache in a release build
+
+      # This repository commits pnpm-lock.yaml, so the release resolves exactly
+      # the dependency graph that CI checked.
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # `lib/` is gitignored, so the tarball needs this build. Order matters:
+      # tsdown consumes the declarations that `tsc -b` emits into lib/types.
+      - name: Build
+        run: |
+          node node_modules/typescript/bin/tsc -b tsconfig.json
+          node node_modules/tsdown/dist/run.mjs
+
+      - name: Resolve the version to publish
+        id: target
+        run: |
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "already=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "already=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # A published version can never be overwritten, so re-running this workflow
+      # (e.g. a tag pushed twice) must be a no-op rather than a red build.
+      - name: Already published
+        if: steps.target.outputs.already == 'true'
+        run: echo "${{ steps.target.outputs.name }}@${{ steps.target.outputs.version }} is already on the registry."
+
+      - name: Publish
+        if: steps.target.outputs.already == 'false'
+        run: npm publish --access public
