@@ -1,5 +1,14 @@
 # dsh-thin-ssh
 
+[![check](https://github.com/Niobium-41-nb/dsh-thin-ssh/actions/workflows/check.yml/badge.svg)](https://github.com/Niobium-41-nb/dsh-thin-ssh/actions/workflows/check.yml) [![license](https://img.shields.io/github/license/Niobium-41-nb/dsh-thin-ssh)](https://github.com/Niobium-41-nb/dsh-thin-ssh/blob/master/LICENSE)
+
+A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin that keeps the agent's
+reasoning loop **local** and moves every server operation to the remote host: commands, file reads and
+writes, and directory listings all run through the local OpenSSH client. It registers six `thin_ssh_*`
+tools, starts no daemon, listens on no port, and stores no password or private key.
+
+> 🇨🇳 完整文档为中文，见下文。
+
 让 DeepSeek Harness 的 Agent **主体留在本地**，而所有对服务器的操作都在远端执行。
 
 插件向模型注册六个 `thin_ssh_*` 工具。Agent 仍然在本地思考、读会话、调度工具；每一次实际命令、文件读写、目录列举都通过本机 OpenSSH 客户端送到服务器。它不启动常驻服务，不监听端口，也不保存任何密码或私钥。
